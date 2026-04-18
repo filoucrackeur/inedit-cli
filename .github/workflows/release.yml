@@ -254,14 +254,14 @@ jobs:
         shell: bash
         run: |
           mkdir -p inedit-cli-x64/Applications
-          cp x64/inedit-cli inedit-cli-x64/Applications/
+          cp x64/x86_64-apple-darwin/release/inedit-cli inedit-cli-x64/Applications/
           hdiutil create -volname "inedit-cli-x64" -srcfolder inedit-cli-x64 -ov -format UDZO inedit-cli-macos-x64.dmg
 
       - name: Create DMG for ARM64
         shell: bash
         run: |
           mkdir -p inedit-cli-arm64/Applications
-          cp arm64/inedit-cli inedit-cli-arm64/Applications/
+          cp arm64/aarch64-apple-darwin/release/inedit-cli inedit-cli-arm64/Applications/
           hdiutil create -volname "inedit-cli-arm64" -srcfolder inedit-cli-arm64 -ov -format UDZO inedit-cli-macos-arm64.dmg
 
       - name: Upload Release Asset
