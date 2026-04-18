@@ -17,68 +17,9 @@ A terminal-based INI/conf file editor built in Rust with interactive TUI navigat
 [![Rust](https://img.shields.io/badge/Rust-1.70%2B-orange)](https://www.rust-lang.org/)
 [![TUI](https://img.shields.io/badge/TUI-Ratatui-blue)](https://github.com/ratatui-org/ratatui)
 
-## Screenshots
+## Screenshot
 
-### Main Interface
-```
-┌─ inedit-cli ──────────────────────────────────────────┐
-│  📁 test.ini                            🔍 /  │
-├───────────────────────────────────────────────┬──────┤
-│ SECTIONS                              │ VALUES│
-│ ▸ [database]                        │ host  │
-│   [server]                        │ port  │
-│   [cache]                        │ max_c │
-│   [security]                      │ enabl │
-│   [features]                      │       │
-│   [mail]                        │       │
-│   [backup]                      │       │
-│   [monitoring]                  │       │
-├───────────────────────────────────────────────┤
-│  database.host = localhost                      │
-│  database.port = 5432                      │
-│  database.max_connections = 100              │
-│  database.enabled = true                    │
-├───────────────────────────────────────────┤
-│ [? HELP] [S SAVE] [Q QUIT]                     │
-└────────────────────────────────────────────┘
-```
-
-### Search Feature
-```
-┌─ SEARCH ─────────────────────────────────────────┐
-│  🔍 /                                      │
-├───────────────────────────────────────────────┤
-│ Search: ma                                   │
-├───────────────────────────────────────────────┤
-│ RESULTS:                                    │
-│   • [database] : max_connections             │
-│   • [server] : worker_threads             │
-│   • [cache] : ttl                    │
-│   • mode = production                  │
-│   • debug = false                 │
-├───────────────────────────────────────────────┤
-│ [ENTER] Select  [ESC] Cancel                    │
-└────────────────────────────────────────────┘
-```
-
-### Multi-language Support
-```
-┌─ LANGUAGE ────────────────────────────────────────┐
-│  🌐 Select Language: French (fr)              │
-├───────────────────────────────────────────────┤
-│   1. English (en)                         │
-│   2. French (fr)                        │
-│   3. German (de)                       │
-│   4. Spanish (es)                      │
-│   5. Italian (it)                      │
-│   6. Portuguese (pt)                     │
-│   7. Russian (ru)                       │
-│   8. Chinese Simplified (zh_CN)        │
-│   ... (+19 more)                        │
-├───────────────────────────────────────────────┤
-│ [↑/↓] Navigate  [ENTER] Select           │
-└────────────────────────────────────────────┘
-```
+![inedit-cli](images/capture1.png)
 
 ## Features
 
@@ -135,6 +76,7 @@ flatpak install inedit-cli.flatpak
 
 #### macOS
 ```bash
+brew untap filoucrackeur/inedit-cli
 brew install inedit-cli
 ```
 
