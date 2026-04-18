@@ -253,17 +253,15 @@ jobs:
       - name: Create DMG for x64
         shell: bash
         run: |
-          ls -laR x64/
           mkdir -p inedit-cli-x64/Applications
-          cp x64/target/x86_64-apple-darwin/release/inedit-cli inedit-cli-x64/Applications/
+          cp x64/inedit-cli inedit-cli-x64/Applications/
           hdiutil create -volname "inedit-cli-x64" -srcfolder inedit-cli-x64 -ov -format UDZO inedit-cli-macos-x64.dmg
 
       - name: Create DMG for ARM64
         shell: bash
         run: |
-          ls -laR arm64/
           mkdir -p inedit-cli-arm64/Applications
-          cp arm64/target/aarch64-apple-darwin/release/inedit-cli inedit-cli-arm64/Applications/
+          cp arm64/inedit-cli inedit-cli-arm64/Applications/
           hdiutil create -volname "inedit-cli-arm64" -srcfolder inedit-cli-arm64 -ov -format UDZO inedit-cli-macos-arm64.dmg
 
       - name: Upload Release Asset
@@ -290,7 +288,6 @@ jobs:
       - name: Create Debian package structure
         shell: bash
         run: |
-          ls -laR download/
           mkdir -p debian-package/usr/bin
           mkdir -p debian-package/usr/share/doc/inedit-cli
           mkdir -p debian-package/DEBIAN
@@ -339,7 +336,6 @@ jobs:
       - name: Create RPM package structure
         shell: bash
         run: |
-          ls -laR download/
           mkdir -p rpmbuild/BUILDROOT
           mkdir -p rpmbuild/RPMS/x86_64
           mkdir -p rpmbuild/SOURCES
