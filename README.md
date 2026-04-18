@@ -65,7 +65,7 @@ A terminal-based INI/conf file editor built in Rust with interactive TUI navigat
 ```
 ┌─ LANGUAGE ────────────────────────────────────────┐
 │  🌐 Select Language: French (fr)              │
-├────────────────────────��──────────────────────┤
+├───────────────────────────────────────────────┤
 │   1. English (en)                         │
 │   2. French (fr)                        │
 │   3. German (de)                       │
