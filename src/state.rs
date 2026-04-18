@@ -365,6 +365,7 @@ impl AppState {
         self.status_message = Some((message, false));
     }
 
+    #[allow(dead_code)]
     pub fn clear_status(&mut self) {
         self.status_message = None;
     }

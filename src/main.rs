@@ -719,7 +719,7 @@ fn show_help_popup(frame: &mut Frame) {
     let inner_rect = popup_block.inner(area);
     frame.render_widget(popup_block, area);
 
-    let (save_shortcut_mac, save_label) = get_save_shortcut();
+    let (save_shortcut_mac, _save_label) = get_save_shortcut();
 
     let navigation = i18n::t("navigation");
     let section_next = i18n::t("section_next");
