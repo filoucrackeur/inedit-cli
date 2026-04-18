@@ -253,7 +253,6 @@ jobs:
       - name: Create DMG for x64
         shell: bash
         run: |
-          ls -laR x64/
           mkdir -p inedit-cli-x64/Applications
           cp x64/x86_64-apple-darwin/release/inedit-cli inedit-cli-x64/Applications/
           hdiutil create -volname "inedit-cli-x64" -srcfolder inedit-cli-x64 -ov -format UDZO inedit-cli-macos-x64.dmg
@@ -261,7 +260,6 @@ jobs:
       - name: Create DMG for ARM64
         shell: bash
         run: |
-          ls -laR arm64/
           mkdir -p inedit-cli-arm64/Applications
           cp arm64/aarch64-apple-darwin/release/inedit-cli inedit-cli-arm64/Applications/
           hdiutil create -volname "inedit-cli-arm64" -srcfolder inedit-cli-arm64 -ov -format UDZO inedit-cli-macos-arm64.dmg
@@ -290,7 +288,6 @@ jobs:
       - name: Create Debian package structure
         shell: bash
         run: |
-          ls -laR download/
           mkdir -p debian-package/usr/bin
           mkdir -p debian-package/usr/share/doc/inedit-cli
           mkdir -p debian-package/DEBIAN
@@ -345,7 +342,6 @@ jobs:
           mkdir -p rpmbuild/SOURCES
           mkdir -p rpmbuild/SPECS
           
-          ls -laR download/
           cp download/x86_64-unknown-linux-gnu/release/inedit-cli rpmbuild/SOURCES/inedit-cli
           
           VERSION="${{ github.ref_name }}"
@@ -377,8 +373,6 @@ jobs:
       - name: Build RPM package
         shell: bash
         run: |
-          ls -la rpmbuild/SOURCES/
-          ls -la rpmbuild/SPECS/
           rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/inedit-cli.spec
 
       - name: Upload Release Asset
