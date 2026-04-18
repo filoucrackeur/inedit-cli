@@ -345,15 +345,16 @@ jobs:
           mkdir -p rpmbuild/SOURCES
           mkdir -p rpmbuild/SPECS
           
+          ls -laR download/
           cp download/x86_64-unknown-linux-gnu/release/inedit-cli rpmbuild/SOURCES/inedit-cli
           
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
           
-          cat > rpmbuild/SPECS/inedit-cli.spec << EOF
+          cat > rpmbuild/SPECS/inedit-cli.spec << 'EOF'
           Name:           inedit-cli
-          Version:        $VERSION
-          Release:        1%{?dist}
+          Version:        VERSION_PLACEHOLDER
+          Release:        1
           Summary:        Terminal-based INI/conf file editor
           License:        MIT
           URL:            https://github.com/filoucrackeur/inedit-cli
@@ -363,24 +364,21 @@ jobs:
           A terminal-based INI/conf file editor built in Rust with
           interactive TUI navigation.
           
-          %prep
-          %setup -c -n inedit-cli
-          
           %install
           mkdir -p %{buildroot}/usr/bin
           install -m 755 %{_sourcedir}/inedit-cli %{buildroot}/usr/bin/inedit-cli
           
           %files
           /usr/bin/inedit-cli
-          
-          %changelog
-          * Thu Apr 17 2025 Release 1
-          - Initial RPM package
           EOF
+          
+          sed -i "s/VERSION_PLACEHOLDER/$VERSION/" rpmbuild/SPECS/inedit-cli.spec
 
       - name: Build RPM package
         shell: bash
         run: |
+          ls -la rpmbuild/SOURCES/
+          ls -la rpmbuild/SPECS/
           rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/inedit-cli.spec
 
       - name: Upload Release Asset
