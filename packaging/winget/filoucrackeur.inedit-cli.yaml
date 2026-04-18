@@ -1,0 +1,31 @@
+Id: filoucrackeur.inedit-cli
+Name: inedit-cli
+Version: 0.1.0
+Publisher: filoucrackeur
+License: MIT
+LicenseUrl: https://github.com/filoucrackeur/inedit-cli/blob/main/LICENSE
+ShortDescription: A terminal-based INI/conf file editor built in Rust with interactive TUI navigation
+Description: |
+  inedit-cli is a terminal-based INI/conf file editor built in Rust with interactive TUI navigation.
+  Edit configuration files with full keyboard control, multi-language support (27 languages), and search functionality.
+Homepage: https://github.com/filoucrackeur/inedit-cli
+Author: filoucrackeur
+Moniker: inedit-cli
+Tags:
+  - ini
+  - conf
+  - editor
+  - tui
+  - rust
+  - terminal
+  - configuration
+Commands:
+  - inedit-cli
+Scope: machine
+InstallerType: zip
+Installers:
+  - Architecture: x64
+    Url: https://github.com/filoucrackeur/inedit-cli/releases/download/v0.1.0/inedit-cli-windows-x64.zip
+    Sha256: REPLACEME
+    Scope: machine
+    InstallerType: zip

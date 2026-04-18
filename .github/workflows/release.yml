@@ -1,0 +1,393 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-linux-x64:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        shell: bash
+        run: |
+          rm -f .cargo/config.toml
+          cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Create archives
+        shell: bash
+        run: |
+          cd target/x86_64-unknown-linux-gnu/release
+          tar -cvJf ../../inedit-cli-linux-x64.tar.xz inedit-cli
+          tar -cvzf ../../inedit-cli-linux-x64.tar.gz inedit-cli
+          zip -j ../../inedit-cli-linux-x64.zip inedit-cli
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inedit-cli-linux-x64
+          path: |
+            target/x86_64-unknown-linux-gnu/release/inedit-cli
+            target/inedit-cli-linux-x64.tar.xz
+            target/inedit-cli-linux-x64.tar.gz
+            target/inedit-cli-linux-x64.zip
+
+  build-linux-arm64:
+    name: Build Linux ARM64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+
+      - name: Install cross
+        shell: bash
+        run: cargo install cross
+
+      - name: Build release
+        shell: bash
+        run: |
+          rm -f .cargo/config.toml
+          cross build --release --target aarch64-unknown-linux-gnu
+
+      - name: Create archives
+        shell: bash
+        run: |
+          cd target/aarch64-unknown-linux-gnu/release
+          tar -cvJf ../../inedit-cli-linux-arm64.tar.xz inedit-cli
+          tar -cvzf ../../inedit-cli-linux-arm64.tar.gz inedit-cli
+          zip -j ../../inedit-cli-linux-arm64.zip inedit-cli
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inedit-cli-linux-arm64
+          path: |
+            target/aarch64-unknown-linux-gnu/release/inedit-cli
+            target/inedit-cli-linux-arm64.tar.xz
+            target/inedit-cli-linux-arm64.tar.gz
+            target/inedit-cli-linux-arm64.zip
+
+  build-macos-x64:
+    name: Build macOS x64
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin
+
+      - name: Build release
+        shell: bash
+        run: |
+          rm -f .cargo/config.toml
+          cargo build --release --target x86_64-apple-darwin
+
+      - name: Create archives
+        shell: bash
+        run: |
+          cd target/x86_64-apple-darwin/release
+          tar -cvzf ../../inedit-cli-macos-x64.tar.gz inedit-cli
+          zip -j ../../inedit-cli-macos-x64.zip inedit-cli
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inedit-cli-macos-x64
+          path: |
+            target/x86_64-apple-darwin/release/inedit-cli
+            target/inedit-cli-macos-x64.tar.gz
+            target/inedit-cli-macos-x64.zip
+
+  build-macos-arm64:
+    name: Build macOS ARM64
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Build release
+        shell: bash
+        run: |
+          rm -f .cargo/config.toml
+          cargo build --release --target aarch64-apple-darwin
+
+      - name: Create archives
+        shell: bash
+        run: |
+          cd target/aarch64-apple-darwin/release
+          tar -cvzf ../../inedit-cli-macos-arm64.tar.gz inedit-cli
+          zip -j ../../inedit-cli-macos-arm64.zip inedit-cli
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inedit-cli-macos-arm64
+          path: |
+            target/aarch64-apple-darwin/release/inedit-cli
+            target/inedit-cli-macos-arm64.tar.gz
+            target/inedit-cli-macos-arm64.zip
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        shell: bash
+        run: |
+          rm -f .cargo/config.toml
+          cargo build --release
+
+      - name: Create archives
+        shell: bash
+        run: |
+          cp target/release/inedit-cli.exe .
+          tar -cvzf inedit-cli-windows-x64.tar.gz inedit-cli.exe
+          powershell -Command "Compress-Archive -Path inedit-cli.exe -DestinationPath inedit-cli-windows-x64.zip -Force"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inedit-cli-windows
+          path: |
+            target/release/inedit-cli.exe
+            inedit-cli-windows-x64.tar.gz
+            inedit-cli-windows-x64.zip
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-linux-x64, build-linux-arm64, build-macos-x64, build-macos-arm64, build-windows]
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: inedit-cli v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+          overwrite_files: true
+          files: |
+            artifacts/inedit-cli-linux-x64/inedit-cli-linux-x64.tar.xz
+            artifacts/inedit-cli-linux-x64/inedit-cli-linux-x64.tar.gz
+            artifacts/inedit-cli-linux-x64/inedit-cli-linux-x64.zip
+            artifacts/inedit-cli-linux-arm64/inedit-cli-linux-arm64.tar.xz
+            artifacts/inedit-cli-linux-arm64/inedit-cli-linux-arm64.tar.gz
+            artifacts/inedit-cli-linux-arm64/inedit-cli-linux-arm64.zip
+            artifacts/inedit-cli-macos-x64/inedit-cli-macos-x64.tar.gz
+            artifacts/inedit-cli-macos-x64/inedit-cli-macos-x64.zip
+            artifacts/inedit-cli-macos-arm64/inedit-cli-macos-arm64.tar.gz
+            artifacts/inedit-cli-macos-arm64/inedit-cli-macos-arm64.zip
+            artifacts/inedit-cli-windows/inedit-cli-windows-x64.tar.gz
+            artifacts/inedit-cli-windows/inedit-cli-windows-x64.zip
+            artifacts/inedit-cli-windows/inedit-cli.exe
+
+  create-dmg-package:
+    name: Create DMG Packages
+    needs: create-release
+    runs-on: macos-latest
+    steps:
+      - name: Download macOS x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: inedit-cli-macos-x64
+          path: x64
+
+      - name: Download macOS ARM64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: inedit-cli-macos-arm64
+          path: arm64
+
+      - name: Create DMG for x64
+        shell: bash
+        run: |
+          ls -laR x64/
+          mkdir -p inedit-cli-x64/Applications
+          cp x64/x86_64-apple-darwin/release/inedit-cli inedit-cli-x64/Applications/
+          hdiutil create -volname "inedit-cli-x64" -srcfolder inedit-cli-x64 -ov -format UDZO inedit-cli-macos-x64.dmg
+
+      - name: Create DMG for ARM64
+        shell: bash
+        run: |
+          ls -laR arm64/
+          mkdir -p inedit-cli-arm64/Applications
+          cp arm64/aarch64-apple-darwin/release/inedit-cli inedit-cli-arm64/Applications/
+          hdiutil create -volname "inedit-cli-arm64" -srcfolder inedit-cli-arm64 -ov -format UDZO inedit-cli-macos-arm64.dmg
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          files: |
+            inedit-cli-macos-x64.dmg
+            inedit-cli-macos-arm64.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-deb-package:
+    name: Create Debian Package
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: inedit-cli-linux-x64
+          path: .
+
+      - name: Create Debian package structure
+        shell: bash
+        run: |
+          ls -laR inedit-cli-linux-x64/
+          mkdir -p debian-package/usr/bin
+          mkdir -p debian-package/usr/share/doc/inedit-cli
+          mkdir -p debian-package/DEBIAN
+          
+          cp inedit-cli-linux-x64/x86_64-unknown-linux-gnu/release/inedit-cli debian-package/usr/bin/inedit-cli
+          chmod 755 debian-package/usr/bin/inedit-cli
+          
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          
+          cat > debian-package/DEBIAN/control << EOF
+          Package: inedit-cli
+          Version: $VERSION
+          Architecture: amd64
+          Maintainer: Philippe <philippe.court@gmail.com>
+          Description: Terminal-based INI/conf file editor
+           A terminal-based INI/conf file editor built in Rust with
+           interactive TUI navigation.
+          EOF
+
+      - name: Build .deb package
+        shell: bash
+        run: |
+          mkdir -p release
+          dpkg-deb --build debian-package release/inedit-cli_amd64.deb
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          files: release/inedit-cli_amd64.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-rpm-package:
+    name: Create RPM Package
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: inedit-cli-linux-x64
+          path: .
+
+      - name: Create RPM package structure
+        shell: bash
+        run: |
+          ls -laR inedit-cli-linux-x64/
+          mkdir -p rpmbuild/BUILDROOT
+          mkdir -p rpmbuild/RPMS/x86_64
+          mkdir -p rpmbuild/SOURCES
+          mkdir -p rpmbuild/SPECS
+          
+          cp inedit-cli-linux-x64/x86_64-unknown-linux-gnu/release/inedit-cli rpmbuild/SOURCES/inedit-cli
+          
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          
+          cat > rpmbuild/SPECS/inedit-cli.spec << EOF
+          Name:           inedit-cli
+          Version:        $VERSION
+          Release:        1%{?dist}
+          Summary:        Terminal-based INI/conf file editor
+          License:        MIT
+          URL:            https://github.com/filoucrackeur/inedit-cli
+          BuildArch:      x86_64
+          
+          %description
+          A terminal-based INI/conf file editor built in Rust with
+          interactive TUI navigation.
+          
+          %prep
+          %setup -c -n inedit-cli
+          
+          %install
+          mkdir -p %{buildroot}/usr/bin
+          install -m 755 %{_sourcedir}/inedit-cli %{buildroot}/usr/bin/inedit-cli
+          
+          %files
+          /usr/bin/inedit-cli
+          
+          %changelog
+          * Thu Apr 17 2025 Release 1
+          - Initial RPM package
+          EOF
+
+      - name: Build RPM package
+        shell: bash
+        run: |
+          rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/inedit-cli.spec
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          files: rpmbuild/RPMS/x86_64/inedit-cli-*.x86_64.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
